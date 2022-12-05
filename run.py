@@ -3,7 +3,6 @@ import threading
 import telebot
 from time import sleep
 
-
 # Get Telegram Token and admin IDs from config.txt
 with open('config.txt') as c:
     for line in c:
@@ -40,9 +39,10 @@ def url_list(message):
 
 def loop():
     while True:
+        m = final_message()
         for id_user in admin_ids:
-            bot.send_message(id_user, final_message())
-            sleep(1000)
+            bot.send_message(id_user, m)
+        sleep(1000)
 
 
 listen = threading.Thread(target=bot.polling, args=())
