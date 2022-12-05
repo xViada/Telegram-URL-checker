@@ -1,0 +1,2 @@
+telegram-token:your-token
+admin-user-ids:123456789, youridshere, 123456789
