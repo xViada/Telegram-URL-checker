@@ -22,7 +22,8 @@ def send(message):
         bot.reply_to(message, 'Comandos disponibles: /help, /url_list, /add_url')
     else:
         s = f'username:{message.from_user.username}, id:{message.from_user.id}, full_name:' \
-            f'{message.from_user.full_name}, is_bot:{message.from_user.is_bot}\n'
+            f'{message.from_user.full_name}, language_code:{message.from_user.language_code}, ' \
+            f'is_bot:{message.from_user.is_bot}\n'
         print(('\nUNAUTHORIZED /START ATTEMPT\n' + s))
         for id_user in admin_ids:
             try:

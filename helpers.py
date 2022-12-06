@@ -1,3 +1,4 @@
+from constants import *
 import seleniumwire.undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
@@ -32,22 +33,19 @@ def get_urls(mode):
 # Get Final Message
 def final_message():
     system('cls')
-    mega_data = check('mega', '/html/body/div[6]/div[2]/div[2]/section/div[1]/div/div[4]/div[3]/div[2]/div[1]/button')
-    panel_data = check('panel', '/html/body/div[1]/div/div[2]/form/button')
-    tiktok_data = check('tiktok', '//*[@id="app"]/div[2]/div[2]/div/div[1]/div[1]/div[2]/div/div/button')
-    raw_data = check('raw', '/html/body/pre')
+    mega_data = check('mega', MEGA_XPATH)
+    panel_data = check('panel', PANEL_XPATH)
+    tiktok_data = check('tiktok', TIKTOK_XPATH)
+    raw_data = check('raw', RAW_XPATH)
 
-    return ('MEGA: {}/{} working.\n'
-            'Url errors: {}\n'
-            'PANEL: {}/{} working.\n'
-            'Url errors: {}\n'
-            'TIKTOK: {}/{} working.\n'
-            'Url errors: {}\n'
-            'RAW: {}/{} working.\n'
-            'Url errors: {}\n'.format((mega_data[0] - mega_data[1]), mega_data[0], mega_data[2],
-                                      (panel_data[0] - panel_data[1]), panel_data[0], panel_data[2],
-                                      (tiktok_data[0] - tiktok_data[1]), tiktok_data[0], tiktok_data[2],
-                                      (raw_data[0] - raw_data[1]), raw_data[0], raw_data[2]))
+    return (f'MEGA: {(mega_data[COUNT_POS] - mega_data[ERROR_COUNT_POS])}/{mega_data[COUNT_POS]} working.\n'
+            f'Url errors: {mega_data[ERRORS_POS]}\n'
+            f'PANEL: {(panel_data[COUNT_POS] - panel_data[ERROR_COUNT_POS])}/{panel_data[COUNT_POS]} working.\n' 
+            f'Url errors: {panel_data[ERRORS_POS]}\n'
+            f'TIKTOK: {(tiktok_data[COUNT_POS] - tiktok_data[ERROR_COUNT_POS])}/{tiktok_data[COUNT_POS]} working.\n' 
+            f'Url errors: {tiktok_data[ERRORS_POS]}\n'
+            f'RAW: {(raw_data[COUNT_POS] - raw_data[ERROR_COUNT_POS])}/{raw_data[COUNT_POS]} working.\n'
+            f'Url errors: {raw_data[ERRORS_POS]}\n')
 
 
 # URLs checks
