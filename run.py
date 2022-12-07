@@ -1,4 +1,5 @@
-from helpers import final_message
+from constants import *
+from helpers import final_message, workers
 import threading
 import telebot
 from time import sleep
@@ -19,7 +20,7 @@ bot = telebot.TeleBot(token)
 @bot.message_handler(commands=['start'])
 def send(message):
     if message.from_user.id in admin_ids:
-        bot.reply_to(message, 'Comandos disponibles: /help, /url_list, /add_url')
+        bot.reply_to(message, 'Comandos disponibles: /help, /url_list, /add_url y /workers .')
     else:
         s = f'username:{message.from_user.username}, id:{message.from_user.id}, full_name:' \
             f'{message.from_user.full_name}, language_code:{message.from_user.language_code}, ' \
@@ -37,8 +38,9 @@ def send(message):
 @bot.message_handler(commands=['help'])
 def send(message):
     if message.from_user.id in admin_ids:
-        bot.reply_to(message, '/url_list: Devuelve la lista de URLs que se estan checkeando actualmente.'
-                              '/add_url: Escribe: /add_url http://www.la-url.com para añadir una URL a la lista.')
+        bot.reply_to(message, '/url_list: Devuelve la lista de URLs que se estan checkeando actualmente.\n'
+                              '/add_url: Escribe: /add_url http://www.la-url.com para añadir una URL a la lista.\n'
+                              '/workers: Devuelve informacion sobre el estado de los workers.')
 
 
 @bot.message_handler(commands=['add_url'])
@@ -53,6 +55,17 @@ def url_list(message):
     if message.from_user.id in admin_ids:
         with open('URLs.txt', 'r') as urls:
             bot.reply_to(message, urls.read())
+
+
+@bot.message_handler(commands=['workers'])
+def work(message):
+    if message.from_user.id in admin_ids:
+        work_data = workers()
+        bot.reply_to(message, f'Total: {work_data[TOTAL_POS]}\n'
+                              f'Last 24h: {work_data[LAST_DAY_POS]}\n'
+                              f'Last share: {work_data[SHARE_POS]} at {work_data[SHARE_HOUR_POS]}\n'
+                              f'Current: {work_data[CURRENT_POS][0]}\n'
+                              f'Average: {work_data[AVERAGE_POS][0]}')
 
 
 # @bot.message_handler(commands=['snoopers'])

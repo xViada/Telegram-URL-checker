@@ -1,31 +1,28 @@
 from constants import *
 import seleniumwire.undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import TimeoutException, NoSuchElementException
 from random import randint
 from time import sleep
 from os import system
 
 
-# Create a new instance of the Chrome driver as browser
+# Create a new instance of the Undetected Chrome driver as browser
 def set_browser():
     chrome_options = uc.ChromeOptions()
     browser = uc.Chrome(options=chrome_options)
     return browser
 
 
-# Def URLs to check
+# Get URLs to check
 def get_urls(mode):
     urls = []
     with open('URLs.txt') as db:
         for line in db:
-            if mode == 'mega' and line.startswith('https://mega.nz/file/'):
-                urls.append(line.rstrip())
-            if mode == 'panel' and line.startswith('http://technical'):
-                urls.append(line.rstrip())
-            if mode == 'tiktok' and line.startswith('https://www.tiktok.com/'):
-                urls.append(line.rstrip())
-            if mode == 'raw' and line.startswith('https://pastebin.com/' or 'https://rentry.co/'):
+            if mode == 'mega' and line.startswith('https://mega.nz') or mode == 'panel' and \
+                    line.startswith('http://technical') or mode == 'tiktok' and line.startswith('https://www.tiktok.c')\
+                    or mode == 'raw' and line.startswith('https://pastebin.com/' or 'https://rentry.co/') or mode == \
+                    'workers' and line.startswith('https://xmr.2miners.com/'):
                 urls.append(line.rstrip())
     return urls
 
@@ -48,7 +45,7 @@ def final_message():
             f'Url errors: {raw_data[ERRORS_POS]}\n')
 
 
-# URLs checks
+# URLs check
 def check(mode, xpath):
     urls = get_urls(mode)
     url_error = []
@@ -87,3 +84,33 @@ def check(mode, xpath):
     browser.close()
 
     return [url_count, url_error_count, url_error]
+
+
+def workers():
+    urls = get_urls('workers')
+    browser = set_browser()
+    total = 'ERROR'
+    last_24 = 'ERROR'
+    last_share = 'ERROR'
+    share_hour = 'ERROR'
+    current = 'ERROR'
+    average = 'ERROR'
+    for url in urls:
+        try:
+            browser.get(url)
+            total = browser.find_element(By.XPATH, TOTAL).text
+            last_24 = browser.find_element(By.XPATH, LAST_24).text
+            last_share = browser.find_element(By.XPATH, LAST_SHARE).text
+            share_hour = browser.find_element(By.XPATH, SHARE_HOUR).text
+            current = [browser.find_element(By.XPATH, CURRENT[0]).text.replace('\n', ' '),
+                       browser.find_element(By.XPATH, CURRENT[1]).text]
+            average = [browser.find_element(By.XPATH, CURRENT[0]).text.replace('\n', ' '),
+                       browser.find_element(By.XPATH, AVERAGE[1]).text]
+
+            browser.close()
+            break
+
+        except TimeoutException or NoSuchElementException:
+            pass
+
+    return total, last_share, share_hour, last_24, current, average
