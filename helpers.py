@@ -1,16 +1,17 @@
 from constants import *
 import seleniumwire.undetected_chromedriver as uc
 from selenium.webdriver.common.by import By
-from selenium.common.exceptions import TimeoutException, NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException
 from random import randint
 from time import sleep
-from os import system
+from os import stat
 
 
 # Create a new instance of the Undetected Chrome driver as browser
 def set_browser():
     chrome_options = uc.ChromeOptions()
     browser = uc.Chrome(options=chrome_options)
+
     return browser
 
 
@@ -18,18 +19,17 @@ def set_browser():
 def get_urls(mode):
     urls = []
     with open('URLs.txt') as db:
-        for line in db:
-            if mode == 'mega' and line.startswith('https://mega.nz') or mode == 'panel' and \
-                    line.startswith('http://technical') or mode == 'tiktok' and line.startswith('https://www.tiktok.c')\
-                    or mode == 'raw' and line.startswith('https://pastebin.com/' or 'https://rentry.co/') or mode == \
-                    'workers' and line.startswith('https://xmr.2miners.com/'):
-                urls.append(line.rstrip())
+        for url in db:
+            if mode == 'mega' and url.startswith('https://mega.nz') or mode == 'panel' and \
+                    url.startswith('http://technica') or mode == 'tiktok' and url.startswith('https://www.tiktok.c') \
+                    or mode == 'raw' and url.startswith('https://pastebin.com/' or 'https://rentry.co/') or mode == \
+                    'workers' and url.startswith('https://xmr.2miners.com/'):
+                urls.append(url.rstrip())
     return urls
 
 
-# Get Final Message
-def final_message():
-    system('cls')
+# Get the URLs status message for telegram
+def urls_final_message():
     mega_data = check('mega', MEGA_XPATH)
     panel_data = check('panel', PANEL_XPATH)
     tiktok_data = check('tiktok', TIKTOK_XPATH)
@@ -37,9 +37,9 @@ def final_message():
 
     return (f'MEGA: {(mega_data[COUNT_POS] - mega_data[ERROR_COUNT_POS])}/{mega_data[COUNT_POS]} working.\n'
             f'Url errors: {mega_data[ERRORS_POS]}\n'
-            f'PANEL: {(panel_data[COUNT_POS] - panel_data[ERROR_COUNT_POS])}/{panel_data[COUNT_POS]} working.\n' 
+            f'PANEL: {(panel_data[COUNT_POS] - panel_data[ERROR_COUNT_POS])}/{panel_data[COUNT_POS]} working.\n'
             f'Url errors: {panel_data[ERRORS_POS]}\n'
-            f'TIKTOK: {(tiktok_data[COUNT_POS] - tiktok_data[ERROR_COUNT_POS])}/{tiktok_data[COUNT_POS]} working.\n' 
+            f'TIKTOK: {(tiktok_data[COUNT_POS] - tiktok_data[ERROR_COUNT_POS])}/{tiktok_data[COUNT_POS]} working.\n'
             f'Url errors: {tiktok_data[ERRORS_POS]}\n'
             f'RAW: {(raw_data[COUNT_POS] - raw_data[ERROR_COUNT_POS])}/{raw_data[COUNT_POS]} working.\n'
             f'Url errors: {raw_data[ERRORS_POS]}\n')
@@ -69,7 +69,7 @@ def check(mode, xpath):
                 else:
                     url_count += 1
                     url_error_count += 1
-                    print('{} MEGA NOT WORKING(not clickable): {}'.format(url_count, url))
+                    print('{} {} NOT WORKING(not clickable): {}'.format(url_count, mode, url))
                     url_error.append(url)
             else:
                 url_count += 1
@@ -86,15 +86,11 @@ def check(mode, xpath):
     return [url_count, url_error_count, url_error]
 
 
-def workers():
+# Get the workers status message for telegram
+def workers_final_message():
     urls = get_urls('workers')
     browser = set_browser()
-    total = 'ERROR'
-    last_24 = 'ERROR'
-    last_share = 'ERROR'
-    share_hour = 'ERROR'
-    current = 'ERROR'
-    average = 'ERROR'
+    workers = '⚠️WORKERS WEB NOT AVAILABLE⚠️'
     for url in urls:
         try:
             browser.get(url)
@@ -108,9 +104,35 @@ def workers():
                        browser.find_element(By.XPATH, AVERAGE[1]).text]
 
             browser.close()
-            break
+            workers = f'Total: {total}\n' \
+                      f'Last 24h: {last_24}\n' \
+                      f'Last share: {last_share} at {share_hour}\n' \
+                      f'Current: {current[0]}\n' \
+                      f'Average: {average[0]}'
 
-        except TimeoutException or NoSuchElementException:
-            pass
+        except Exception as e:
+            print(e)
 
-    return total, last_share, share_hour, last_24, current, average
+    return workers
+
+
+def refresh_admin_ids():
+    with open('config.txt') as config:
+        for x in config:
+            if x.startswith('admin-user-ids:'):
+                a = x.strip('admin-user-ids:').split(', ')
+                admin_ids = [eval(i) for i in a]
+
+    return admin_ids
+
+
+def refresh_snoopers_db():
+    snoopers = []
+    if stat('snoopers.txt').st_size == 0:
+        snoopers.append('Not snoopers in database.')
+    else:
+        with open('snoopers.txt') as db:
+            for snoop in db:
+                snoopers.append(snoop)
+
+    return snoopers

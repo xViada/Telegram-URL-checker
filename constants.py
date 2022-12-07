@@ -24,4 +24,3 @@ CURRENT = ['/html/body/div/section/div[1]/div/div[2]/div/div/div[1]/div/div/h4/s
            '/html/body/div/section/div[1]/div/div[2]/div/div/div[1]/div/div/h4/span[1]/span']
 AVERAGE = ['/html/body/div/section/div[1]/div/div[2]/div/div/div[2]/div/div/h4/span[1]',
            '/html/body/div/section/div[1]/div/div[2]/div/div/div[1]/div/div/h4/span[1]/span']
-
